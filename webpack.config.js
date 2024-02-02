@@ -45,4 +45,26 @@ const extensionConfig = {
     level: "log", // enables logging required for problem matchers
   },
 };
-module.exports = [ extensionConfig ];
+
+const webviewConfig = {
+  target: 'web',
+  entry: './src/main.tsx',
+  output: {
+    filename: '[name].wv.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx'],
+  },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, use: ['babel-loader', 'ts-loader'] },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+};
+
+module.exports = [ extensionConfig, webviewConfig ];

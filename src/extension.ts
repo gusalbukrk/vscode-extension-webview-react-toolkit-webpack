@@ -13,13 +13,16 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.ViewColumn.One,
 			{
 				enableScripts: true,
-				localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'src')],
+				localResourceRoots: [
+					vscode.Uri.joinPath(context.extensionUri, 'src'),
+					vscode.Uri.joinPath(context.extensionUri, 'dist'),
+				],
 			}
 		);
 
 		const documentUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'index.html'));
 		const styleUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'main.css'));
-		const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'main.ts'));
+		const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'dist', 'main.wv.js'));
 
 		panel.webview.html = interpolate(
 			fs.readFileSync(documentUri.fsPath, 'utf8'),
@@ -28,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 				styleUri,
 				scriptUri,
 			},
-		)
+		);
 	}));
 }
 
