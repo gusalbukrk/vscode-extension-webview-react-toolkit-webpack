@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -16,35 +17,29 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 
+		const documentUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'index.html'));
 		const styleUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'main.css'));
 		const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'main.ts'));
 
-		panel.webview.html = getWebviewContent(panel.webview, styleUri, scriptUri);
+		panel.webview.html = interpolate(
+			fs.readFileSync(documentUri.fsPath, 'utf8'),
+			{
+				webview: panel.webview,
+				styleUri,
+				scriptUri,
+			},
+		)
 	}));
 }
 
-
-function getWebviewContent(webview: vscode.Webview, styleUri: vscode.Uri, scriptUri: vscode.Uri) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Coding</title>
-		<!-- https://code.visualstudio.com/api/extension-guides/webview#content-security-policy -->
-		<meta
-			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; img-src ${webview.cspSource} https:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
-		/>
-	
-		<link rel="stylesheet" href="${styleUri}">
-</head>
-<body>
-		<h1>Coding</h1>
-    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
-		<script src="${scriptUri}"></script>
-</body>
-</html>`;
+// evaluate given str as a template literal with obj as its variables
+// could've used eval instead (`eval('`' + fs.readFileSync(documentUri.fsPath, 'utf8') + '`')`)
+// this method was chosen because it's evident which variables are needed in the template
+function interpolate(str: string, obj: Record<string, unknown>) {
+	return new Function( // new Function(arg1, arg2, /* …, */ argN, functionBody)
+		...Object.keys(obj),
+		`return \`${str}\`;`,
+		)(...Object.values(obj));
 }
 
 export function deactivate() {}
