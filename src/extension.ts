@@ -41,7 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
 function interpolate(str: string, obj: Record<string, unknown>) {
 	return new Function( // new Function(arg1, arg2, /* …, */ argN, functionBody)
 		...Object.keys(obj),
-		`return \`${str}\`;`,
+		`return \`${
+			str.replaceAll('`', '\\`') // escape backticks, otherwise error if `str` contains backticks
+		}\`;`,
 		)(...Object.values(obj));
 }
 
