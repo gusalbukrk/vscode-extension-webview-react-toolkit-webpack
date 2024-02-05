@@ -24,6 +24,21 @@ export function activate(context: vscode.ExtensionContext) {
 		const styleUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'main.css'));
 		const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'dist', 'main.wv.js'));
 
+		panel.webview.onDidReceiveMessage(
+      (message: any) => {
+        const command = message.command;
+        const text = message.text;
+
+        switch (command) {
+          case "howdy":
+            vscode.window.showInformationMessage(text);
+            return;
+        }
+      },
+      undefined,
+      context.subscriptions,
+		);
+
 		panel.webview.html = interpolate(
 			fs.readFileSync(documentUri.fsPath, 'utf8'),
 			{

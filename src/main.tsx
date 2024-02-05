@@ -8,10 +8,17 @@ const App = () => {
   return (
       <div>
           <h2>Hello, world!</h2>
-          <vscode-button id="howdy">Howdy!</vscode-button>
+          <vscode-button id="howdy" onClick={handleButtonClick}>Howdy!</vscode-button>
       </div>
   );
 };
+
+function handleButtonClick() {
+  vscode.postMessage({
+      command: 'howdy',
+      text: 'Hey there partner!'
+  });
+}
 
 ReactDOM.render(<App />, document.getElementById('root') as HTMLElement);
 
